@@ -1,0 +1,43 @@
+# Virtual environments & caches
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+dist/
+build/
+
+# Internal project notes & markdown docs (keep only README.md in GitHub)
+*.md
+!README.md
+
+# Datasets & run outputs (root folders only — keep src/attire_compliance/data/ tracked!)
+/data/
+/outputs/
+
+# Trained weights: ignore caches/intermediate checkpoints, keep ONLY v1 runtime weights
+*.pt
+*.pth
+*.onnx
+*.engine
+/models/*
+!/models/pretrained/
+/models/pretrained/*
+!/models/pretrained/yolo12n.pt
+!/models/detector/
+/models/detector/*
+!/models/detector/yolo12n_attire_v1.pt
+!/models/classifier/
+/models/classifier/*
+!/models/classifier/effnetv2s_compliance_v1.pt
+
+# Environment & IDE / OS
+.env
+.env.*
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

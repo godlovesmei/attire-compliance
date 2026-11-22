@@ -1,0 +1,73 @@
+# Mapping sumber dataset publik & lokal ke 6 kelas terkunci di configs/classes.yaml
+
+fashionpedia:
+  hf_dataset: detection-datasets/fashionpedia
+  output_dir: data/raw/fashionpedia
+  # Aturan pemetaan berbasis kategori utama + part (collar, lapel, hood)
+  part_overlap_min_ioa: 0.30
+  long_skirt_min_height_ratio: 0.35
+  rules:
+    - source_category: "shirt, blouse"
+      require_parts: ["collar"]
+      exclude_parts: []
+      target_class: pakaian_berkerah
+    - source_category: "top, t-shirt, sweatshirt"
+      require_parts: ["collar"]
+      exclude_parts: ["hood"]
+      target_class: pakaian_berkerah
+    - source_category: "jacket"
+      require_parts: ["lapel"]
+      exclude_parts: ["hood"]
+      target_class: jas_almamater
+    - source_category: "top, t-shirt, sweatshirt"
+      require_parts: []
+      exclude_parts: ["collar", "hood"]
+      target_class: kaos_oblong
+    - source_category: "pants"
+      require_parts: []
+      exclude_parts: []
+      target_class: bawahan_panjang
+    - source_category: "skirt"
+      require_parts: []
+      exclude_parts: []
+      long_only: true
+      target_class: bawahan_panjang
+    - source_category: "shoe"
+      require_parts: []
+      exclude_parts: []
+      target_class: sepatu
+
+openimages:
+  zoo_name: open-images-v7
+  output_dir: data/raw/openimages
+  max_samples_per_split:
+    train: 600
+    validation: 150
+    test: 150
+  class_map:
+    Sandal: sandal
+    Trousers: bawahan_panjang
+    Jeans: bawahan_panjang
+
+roboflow:
+  root_dir: data/raw/roboflow
+  datasets:
+    shoe-and-sandal:
+      class_map:
+        Shoe: sepatu
+        shoe: sepatu
+        Sandal: sandal
+        sandal: sandal
+    clothes-detection:
+      class_map:
+        shirt: pakaian_berkerah
+        tshirt: kaos_oblong
+        t-shirt: kaos_oblong
+        pants: bawahan_panjang
+        shoes: sepatu
+    fashion-object-detection:
+      class_map:
+        shirt: pakaian_berkerah
+        "blazer/coat": jas_almamater
+        t-shirt: kaos_oblong
+        "jeans/pants": bawahan_panjang

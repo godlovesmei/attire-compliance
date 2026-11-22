@@ -1,0 +1,27 @@
+# Konfigurasi training classifier kepatuhan berpakaian (EfficientNetV2-S via timm)
+
+backbone: tf_efficientnetv2_s.in21k_ft_in1k
+pretrained: true
+data_dir: data/processed/classification/v1
+output_dir: outputs/runs/classifier
+checkpoint_path: models/classifier/effnetv2s_compliance_v1.pt
+
+class_names:
+  - tidak_sesuai
+  - sesuai
+
+imgsz: 224
+pad_ratio: 0.10
+letterbox: true
+batch_size: 32
+num_workers: 2
+epochs: 80
+patience: 15
+optimizer: AdamW
+lr: 0.0003
+weight_decay: 0.01
+warmup_epochs: 3
+label_smoothing: 0.1
+amp: true
+seed: 42
+device: cuda

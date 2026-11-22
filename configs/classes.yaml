@@ -1,0 +1,32 @@
+# Single source of truth untuk 6 kelas atribut pakaian terkunci (Opsi A: bawahan_panjang)
+classes:
+  - id: 0
+    name: pakaian_berkerah
+    display_name: Pakaian Berkerah
+    description: Kemeja atau polo berkerah
+    role: required_top
+  - id: 1
+    name: jas_almamater
+    display_name: Jas Almamater
+    description: Jas almamater Polibatam atau blazer/jas formal berkerah lapel
+    role: required_top
+  - id: 2
+    name: kaos_oblong
+    display_name: Kaos Oblong
+    description: Kaos tanpa kerah (pelanggaran kecuali tertutup jas almamater)
+    role: violation
+  - id: 3
+    name: bawahan_panjang
+    display_name: Bawahan Panjang
+    description: Celana panjang formal, jeans panjang, atau rok panjang
+    role: required_bottom
+  - id: 4
+    name: sepatu
+    display_name: Sepatu
+    description: Sepatu tertutup
+    role: required_foot
+  - id: 5
+    name: sandal
+    display_name: Sandal
+    description: Sandal atau alas kaki terbuka (selalu pelanggaran)
+    role: violation

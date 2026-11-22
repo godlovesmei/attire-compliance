@@ -1,0 +1,36 @@
+# Konfigurasi training detektor atribut pakaian (YOLOv12 - Ultralytics)
+# Dioptimalkan untuk GPU 6 GB VRAM (RTX 4050 Laptop, Windows WDDM)
+
+model: yolo12n.pt
+pretrained_dir: models/pretrained
+data_yaml: data/processed/detection/v1/data.yaml
+project: outputs/runs/detector
+run_name: yolo12n_attire_v1
+
+imgsz: 640
+batch: 16
+workers: 2
+epochs: 100
+patience: 30
+optimizer: AdamW
+lr0: 0.001
+lrf: 0.01
+weight_decay: 0.0005
+warmup_epochs: 3.0
+amp: true
+cache: false
+seed: 42
+deterministic: true
+device: "0"
+
+augmentation:
+  hsv_h: 0.015
+  hsv_s: 0.7
+  hsv_v: 0.4
+  degrees: 5.0
+  translate: 0.1
+  scale: 0.5
+  fliplr: 0.5
+  flipud: 0.0
+  mosaic: 1.0
+  mixup: 0.0

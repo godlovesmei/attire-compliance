@@ -1,0 +1,39 @@
+# Konfigurasi runtime pipeline & aplikasi demo FastAPI
+
+models:
+  person_detector: models/pretrained/yolo12n.pt
+  attribute_detector: models/detector/yolo12n_attire_v1.pt
+  classifier: models/classifier/effnetv2s_compliance_v1.pt
+
+inference:
+  device: cuda
+  half: true
+  imgsz_detector: 640
+  imgsz_classifier: 224
+  person_pad_ratio: 0.10
+  tracker: bytetrack.yaml
+
+thresholds:
+  person_conf: 0.50
+  attribute_conf_default: 0.45
+  iou_nms: 0.50
+  association_min_ioa: 0.50
+  per_class:
+    pakaian_berkerah: 0.45
+    jas_almamater: 0.45
+    kaos_oblong: 0.45
+    bawahan_panjang: 0.45
+    sepatu: 0.40
+    sandal: 0.40
+
+fusion:
+  mode: fusion  # fusion | rule_only | classifier_only
+  classifier_veto_threshold: 0.80
+  almamater_overrides_tshirt: true
+  smoothing_window: 15
+  bottom_edge_margin_px: 10
+
+server:
+  host: 127.0.0.1
+  port: 8000
+  sessions_dir: outputs/sessions
