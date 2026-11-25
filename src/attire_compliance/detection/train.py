@@ -10,6 +10,7 @@ from typing import Any
 import yaml
 
 from attire_compliance.config import load_all_configs
+from attire_compliance.device import resolve_device
 from attire_compliance.paths import configure_runtime_env, resolve_project_path
 
 
@@ -80,6 +81,7 @@ def train_detector(
     dst_weights.parent.mkdir(parents=True, exist_ok=True)
 
     aug = det_cfg.augmentation
+    run_device, use_cuda = resolve_device(device if device is not None else det_cfg.device)
     model = YOLO(str(pretrained_path))
     train_results = model.train(
         data=str(resolved_data_yaml),
@@ -93,11 +95,11 @@ def train_detector(
         lrf=det_cfg.lrf,
         weight_decay=det_cfg.weight_decay,
         warmup_epochs=det_cfg.warmup_epochs,
-        amp=det_cfg.amp,
+        amp=bool(det_cfg.amp and use_cuda),
         cache=det_cfg.cache,
         seed=det_cfg.seed,
         deterministic=det_cfg.deterministic,
-        device=device if device is not None else det_cfg.device,
+        device=run_device,
         project=str(project_dir),
         name=chosen_run,
         exist_ok=True,

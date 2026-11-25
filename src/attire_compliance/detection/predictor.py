@@ -9,6 +9,7 @@ from typing import Any
 import numpy as np
 import torch
 
+from attire_compliance.device import resolve_device
 from attire_compliance.paths import configure_runtime_env
 
 
@@ -43,8 +44,7 @@ class AttributeDetector:
 
         self.weights_path = path
         self.class_names = dict(class_names)
-        self.use_cuda = torch.cuda.is_available() and device != "cpu"
-        self.device: int | str = 0 if (self.use_cuda and device in ("cuda", "0")) else device
+        self.device, self.use_cuda = resolve_device(device)
         self.quantize = "fp16" if (half and self.use_cuda) else None
         self.imgsz = imgsz
         self.model: Any = YOLO(str(path))

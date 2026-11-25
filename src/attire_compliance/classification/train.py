@@ -27,6 +27,7 @@ from attire_compliance.classification.model import (
     save_classifier_checkpoint,
 )
 from attire_compliance.config import load_classifier_config
+from attire_compliance.device import autocast_context, resolve_torch_device
 from attire_compliance.paths import configure_runtime_env, resolve_project_path
 
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".webp", ".bmp"}
@@ -117,7 +118,7 @@ def _evaluate_loader(
         for images, targets in loader:
             images = images.to(device, non_blocking=True)
             targets = targets.to(device, non_blocking=True)
-            with torch.amp.autocast("cuda", enabled=use_amp):
+            with autocast_context(use_amp):
                 logits = model(images)
                 loss = criterion(logits, targets)
             preds = logits.argmax(dim=1)
@@ -159,8 +160,7 @@ def train_classifier(
     run_dir.mkdir(parents=True, exist_ok=True)
 
     dev_str = device_override or cfg.device
-    use_cuda = torch.cuda.is_available() and dev_str != "cpu"
-    device = torch.device("cuda:0" if use_cuda else "cpu")
+    device, use_cuda = resolve_torch_device(dev_str)
     use_amp = bool(cfg.amp and use_cuda)
 
     model, norm_meta = create_classifier_model(
@@ -255,7 +255,7 @@ def train_classifier(
             images = images.to(device, non_blocking=True)
             targets = targets.to(device, non_blocking=True)
             optimizer.zero_grad(set_to_none=True)
-            with torch.amp.autocast("cuda", enabled=use_amp):
+            with autocast_context(use_amp):
                 logits = model(images)
                 loss = criterion(logits, targets)
             scaler.scale(loss).backward()

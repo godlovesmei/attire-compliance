@@ -21,6 +21,7 @@ from attire_compliance.classification.model import (
 from attire_compliance.config import load_all_configs
 from attire_compliance.data.classification import prelabel_crop_from_gt
 from attire_compliance.detection.predictor import Detection
+from attire_compliance.device import autocast_context, resolve_device, resolve_torch_device
 from attire_compliance.pipeline.fusion import FusionDecision
 from attire_compliance.pipeline.pipeline import FrameResult, FrameTiming, PersonAnalysis
 from attire_compliance.pipeline.smoothing import TemporalSmoother
@@ -91,6 +92,33 @@ def test_temporal_smoother_suppresses_single_frame_flicker() -> None:
     smoother.reset()
     smoother.step_frame()
     assert smoother.update(1, "TIDAK SESUAI") == "TIDAK SESUAI"
+
+
+def test_device_resolution_cpu_fallback_and_cuda(monkeypatch: Any) -> None:
+    import torch
+
+    # Simulasikan laptop klien tanpa CUDA GPU: request "cuda" atau "0" HARUS fallback ke "cpu"
+    monkeypatch.setattr(torch.cuda, "is_available", lambda: False)
+    assert resolve_device("cuda") == ("cpu", False)
+    assert resolve_device("0") == ("cpu", False)
+    assert resolve_device("cuda:0") == ("cpu", False)
+    assert resolve_device("auto") == ("cpu", False)
+    assert resolve_device("cpu") == ("cpu", False)
+    t_dev, use_cuda = resolve_torch_device("cuda")
+    assert t_dev == torch.device("cpu")
+    assert use_cuda is False
+    with autocast_context(True):
+        pass
+
+    # Simulasikan workstation dengan CUDA GPU tersedia
+    monkeypatch.setattr(torch.cuda, "is_available", lambda: True)
+    assert resolve_device("cuda") == (0, True)
+    assert resolve_device("0") == (0, True)
+    assert resolve_device("cuda:1") == (1, True)
+    assert resolve_device("cpu") == ("cpu", False)
+    t_dev_gpu, use_cuda_gpu = resolve_torch_device("cuda")
+    assert t_dev_gpu == torch.device("cuda:0")
+    assert use_cuda_gpu is True
 
 
 class _StubPipeline:

@@ -89,7 +89,8 @@
       els.statusDot.classList.add("online");
       const detName = health.attribute_detector || "belum ada";
       const clfText = health.classifier ? "Hybrid Fusion" : "Rule-Only";
-      els.modelStatus.textContent = `${detName} · ${clfText}`;
+      const hwText = health.cuda_available ? "GPU" : "CPU";
+      els.modelStatus.textContent = `${detName} · ${clfText} · ${hwText}`;
       els.clfBadge.textContent = health.classifier ? "Aktif" : "Belum dilatih";
     } catch (err) {
       els.statusDot.classList.add("error");

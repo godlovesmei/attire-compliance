@@ -12,6 +12,7 @@ from attire_compliance.classification.model import (
     build_classifier_transforms,
     load_classifier_checkpoint,
 )
+from attire_compliance.device import autocast_context, resolve_torch_device
 
 
 @dataclass(frozen=True)
@@ -34,8 +35,7 @@ class ComplianceClassifier:
         half: bool = True,
     ) -> None:
         path = Path(checkpoint_path)
-        self.use_cuda = torch.cuda.is_available() and device != "cpu"
-        self.device = torch.device("cuda:0" if self.use_cuda else "cpu")
+        self.device, self.use_cuda = resolve_torch_device(device)
         self.half = bool(half and self.use_cuda)
 
         model, meta = load_classifier_checkpoint(path, map_location=self.device)
@@ -59,7 +59,7 @@ class ComplianceClassifier:
         tensors = [self.transform(crop.convert("RGB")) for crop in crops]
         batch = torch.stack(tensors, dim=0).to(self.device, non_blocking=True)
 
-        with torch.inference_mode(), torch.amp.autocast("cuda", enabled=self.half):
+        with torch.inference_mode(), autocast_context(self.half):
             logits = self.model(batch)
             probs = torch.softmax(logits.float(), dim=-1).cpu().numpy()
 

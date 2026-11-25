@@ -16,6 +16,7 @@ from attire_compliance.classification.model import crop_person_with_padding
 from attire_compliance.config import load_all_configs
 from attire_compliance.data.merge import IMAGE_EXTS, parse_yolo_label_file
 from attire_compliance.detection.predictor import Detection
+from attire_compliance.device import resolve_device
 from attire_compliance.paths import configure_runtime_env, resolve_project_path
 from attire_compliance.pipeline.association import (
     PersonBox,
@@ -131,8 +132,7 @@ def build_classification_dataset(
 
     person_weights = resolve_project_path(app_cfg.models.person_detector, project_root)
     person_model = YOLO(str(person_weights))
-    use_cuda = torch.cuda.is_available() and device != "cpu"
-    run_device: int | str = 0 if (use_cuda and device in ("cuda", "0")) else device
+    run_device, _ = resolve_device(device)
 
     fp_meta = _load_fashionpedia_raw_categories(
         resolve_project_path(cfgs.sources.fashionpedia.output_dir, project_root)

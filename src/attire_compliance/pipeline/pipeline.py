@@ -15,6 +15,7 @@ from attire_compliance.classification.predictor import ComplianceClassifier, Com
 from attire_compliance.config import FusionMode, ProjectConfigs, load_all_configs
 from attire_compliance.detection.predictor import AttributeDetector, Detection
 from attire_compliance.detection.prelabel import nms_detections
+from attire_compliance.device import resolve_device
 from attire_compliance.paths import configure_runtime_env, resolve_project_path
 from attire_compliance.pipeline.association import (
     PersonBox,
@@ -80,8 +81,7 @@ class AttireCompliancePipeline:
         self.person_crop_attributes = person_crop_attributes
 
         dev = self.app_cfg.inference.device
-        self.use_cuda = torch.cuda.is_available() and dev != "cpu"
-        self.device: int | str = 0 if (self.use_cuda and dev in ("cuda", "0")) else dev
+        self.device, self.use_cuda = resolve_device(dev)
         self.half = bool(self.app_cfg.inference.half and self.use_cuda)
         self.quantize = "fp16" if self.half else None
 

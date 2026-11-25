@@ -14,7 +14,7 @@ Seluruh bobot model terlatih (`yolo12n.pt`, `yolo12n_attire_v1.pt`, dan `effnetv
 ### Kebutuhan Sistem
 - Windows 10/11 atau Linux
 - Python 3.12 (dikelola otomatis oleh `uv`)
-- GPU NVIDIA dengan driver terbaru (dikembangkan & diuji pada RTX 4050 Laptop 6 GB VRAM — *CUDA Toolkit tidak perlu diinstal terpisah*)
+- **GPU NVIDIA (disarankan)** untuk real-time tinggi (dikembangkan pada RTX 4050 Laptop 6 GB VRAM — *CUDA Toolkit tidak perlu diinstal terpisah*) **atau CPU** (sistem otomatis *fallback* ke CPU bila CUDA tidak tersedia)
 - Webcam (untuk mode Live Webcam)
 
 ### Instalasi & Menjalankan Aplikasi

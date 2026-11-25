@@ -15,6 +15,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from attire_compliance.config import load_all_configs
+from attire_compliance.device import resolve_device
 from attire_compliance.paths import configure_runtime_env, resolve_project_path
 
 
@@ -154,6 +155,7 @@ def evaluate_detector(
 
     det_out = output_dir / "detector"
     det_out.mkdir(parents=True, exist_ok=True)
+    run_device, _ = resolve_device(device)
 
     model = YOLO(str(resolved_weights))
     val_res = model.val(
@@ -161,7 +163,7 @@ def evaluate_detector(
         split=split,
         imgsz=imgsz,
         batch=batch,
-        device=device,
+        device=run_device,
         plots=True,
         project=str(det_out),
         name="overall_plots",
@@ -223,7 +225,7 @@ def evaluate_detector(
                 split="test",
                 imgsz=imgsz,
                 batch=min(batch, local_count),
-                device=device,
+                device=run_device,
                 plots=True,
                 project=str(det_out),
                 name="local_subset_plots",

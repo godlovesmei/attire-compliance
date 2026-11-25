@@ -30,6 +30,7 @@ from attire_compliance.classification.model import (
 )
 from attire_compliance.classification.train import BinaryAttireDataset
 from attire_compliance.config import load_classifier_config
+from attire_compliance.device import autocast_context, resolve_torch_device
 from attire_compliance.paths import configure_runtime_env, resolve_project_path
 
 
@@ -188,8 +189,7 @@ def evaluate_classifier(
     if not split_dir.is_dir():
         raise FileNotFoundError(f"Direktori split classifier tidak ditemukan: {split_dir}")
 
-    use_cuda = torch.cuda.is_available() and device != "cpu"
-    torch_dev = torch.device("cuda:0" if use_cuda else "cpu")
+    torch_dev, use_cuda = resolve_torch_device(device)
 
     model, meta = load_classifier_checkpoint(ckpt, map_location=torch_dev)
     model = model.to(torch_dev)
@@ -222,7 +222,7 @@ def evaluate_classifier(
     with torch.inference_mode():
         for images, targets in loader:
             images = images.to(torch_dev, non_blocking=True)
-            with torch.amp.autocast("cuda", enabled=use_cuda):
+            with autocast_context(use_cuda):
                 logits = model(images)
             probs = torch.softmax(logits.float(), dim=1).cpu().numpy()
             preds = np.argmax(probs, axis=1)

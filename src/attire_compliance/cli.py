@@ -850,12 +850,20 @@ def serve(
     ] = False,
 ) -> None:
     """Jalankan aplikasi demo web single-page FastAPI."""
+    import torch
     import uvicorn
 
     app_cfg = load_app_config()
     bind_host = host or app_cfg.server.host
     bind_port = port or app_cfg.server.port
-    console.print(f"[green]Menjalankan aplikasi demo di http://{bind_host}:{bind_port}[/green]")
+    if torch.cuda.is_available() and app_cfg.inference.device != "cpu":
+        hw_info = f"GPU CUDA ({torch.cuda.get_device_name(0)})"
+    else:
+        hw_info = "CPU (CUDA tidak tersedia — fallback otomatis)"
+    console.print(
+        f"[green]Menjalankan aplikasi demo di http://{bind_host}:{bind_port}[/green] "
+        f"[cyan][{hw_info}][/cyan]"
+    )
     uvicorn.run(
         "attire_compliance.app.main:app",
         host=bind_host,
